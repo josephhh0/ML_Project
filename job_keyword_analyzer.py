@@ -28,6 +28,7 @@ keyword = st.text_input("Enter a keyword or phrase to find relevant jobs:")
 
 # Preprocess data once
 df = pd.read_csv("preprocessed_data.csv")
+df = df.dropna(subset=["description"])
 
 # TF-IDF Vectorizer
 tfidf = TfidfVectorizer()
