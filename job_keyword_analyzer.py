@@ -23,7 +23,7 @@ def recommend_by_keyword(keyword, df, tfidf, tfidf_matrix, top_n=5):
 # Streamlit interface
 st.title("Job Keyword Analyzer")
 
-keyword = st.text_input("Enter a keyword or phrase to find relevant jobs:")
+keyword = st.text_input("Please Enter a keyword or phrase to find relevant jobs:")
 
 
 # Preprocess data once
