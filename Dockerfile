@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "job_keyword_analyzer.py"]
+CMD ["streamlit", "run", "job_keyword_2.py"]

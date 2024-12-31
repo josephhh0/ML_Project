@@ -18,7 +18,7 @@ def recommend_by_keyword(keyword, df, tfidf, tfidf_matrix, top_n=5):
     keyword_vector = tfidf.transform([keyword])
     similarity_scores = cosine_similarity(keyword_vector, tfidf_matrix).flatten()
     top_indices = similarity_scores.argsort()[::-1][:top_n]
-    return df.iloc[top_indices][['title']]
+    return df.iloc[top_indices][['title','company','location','Employment type']]
 
 # Streamlit interface
 st.title("Job Keyword Analyzer")
