@@ -13,68 +13,44 @@ nltk.download('omw-1.4')
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
-# Function to preprocess and cluster jobs
 def cluster_jobs(df, n_clusters=5):
     tfidf = TfidfVectorizer()
     tfidf_matrix = tfidf.fit_transform(df["description"])
     
-    # Apply KMeans clustering
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     clusters = kmeans.fit_predict(tfidf_matrix)
-    df["cluster"] = clusters  # Add cluster labels to the dataframe
+    df["cluster"] = clusters
     
     return tfidf, tfidf_matrix, kmeans, df
 
-# Function to recommend jobs based on keyword
-def recommend_by_keyword(keyword, df, tfidf, tfidf_matrix, top_n=5):
-    keyword_vector = tfidf.transform([keyword])
-    similarity_scores = cosine_similarity(keyword_vector, tfidf_matrix).flatten()
-    top_indices = similarity_scores.argsort()[::-1][:top_n]
-    return df.iloc[top_indices][['title', 'company', 'location', 'Employment type']]
-
-# Function to recommend jobs based on cluster
 def recommend_by_cluster(keyword, df, tfidf, tfidf_matrix, kmeans, top_n=5):
     keyword_vector = tfidf.transform([keyword])
-    cluster_label = kmeans.predict(keyword_vector)[0]  # Predict the cluster for the keyword
+    cluster_label = kmeans.predict(keyword_vector)[0] 
     
-    # Filter jobs within the same cluster
     cluster_jobs = df[df["cluster"] == cluster_label]
     
-    # Calculate cosine similarity for jobs in the same cluster
     cluster_matrix = tfidf_matrix[df["cluster"] == cluster_label]
     similarity_scores = cosine_similarity(keyword_vector, cluster_matrix).flatten()
     top_indices = similarity_scores.argsort()[::-1][:top_n]
     
     return cluster_jobs.iloc[top_indices][['title', 'company', 'location', 'Employment type']]
 
-# Streamlit interface
 st.title("Job Data Explorer")
 
-# Load and preprocess data
 df = pd.read_csv("preprocessed_data.csv")
 df = df.dropna(subset=["description"])
 
-# Cluster jobs and prepare data
 tfidf, tfidf_matrix, kmeans, df = cluster_jobs(df)
 
-# Main selection: Keyword search or visualizations
 choice = st.radio("Hello There ! What would you like to do ?", ("Enter a keyword for job recommendations", "View data visualizations"))
 
 if choice == "Enter a keyword for job recommendations":
     keyword = st.text_input("Enter a keyword or phrase to find relevant jobs:")
 
     if keyword:
-        cluster_choice = st.radio("Would you like to use clustering or keyword-based search?", ("Keyword-based", "Clustering-based"))
-
-        if cluster_choice == "Keyword-based":
-            recommendations = recommend_by_keyword(keyword, df, tfidf, tfidf_matrix)
-            st.write("Job Recommendations (Keyword-based):")
-            st.table(recommendations)
-
-        elif cluster_choice == "Clustering-based":
-            recommendations = recommend_by_cluster(keyword, df, tfidf, tfidf_matrix, kmeans)
-            st.write("Job Recommendations (Clustering-based):")
-            st.table(recommendations)
+        recommendations = recommend_by_cluster(keyword, df, tfidf, tfidf_matrix, kmeans)
+        st.write("Job Recommendations :")
+        st.table(recommendations)
 
 elif choice == "View data visualizations":
     st.write("## Data Visualizations")
@@ -92,7 +68,6 @@ elif choice == "View data visualizations":
         ],
     )
 
-    # Display selected visualization
     if visualization == "Répartition des types d'emploi":
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.countplot(data=df, y='Employment type', order=df['Employment type'].value_counts().index, ax=ax)
