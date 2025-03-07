@@ -35,7 +35,7 @@ def recommend_by_cluster(keyword, df, tfidf, tfidf_matrix, kmeans, top_n=5):
     
     return cluster_jobs.iloc[top_indices][['title', 'company', 'location', 'Employment type']]
 
-st.title("Job Data Explorer")
+st.title("Job Data Explorer (test)")
 
 df = pd.read_csv("preprocessed_data.csv")
 df = df.dropna(subset=["description"])
