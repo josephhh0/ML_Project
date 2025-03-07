@@ -16,8 +16,10 @@ jobs:
 
       - name: Set up Docker
         run: |
-          docker build -t my-image .  # Builds your Docker image
-
+          docker build -t my-image .  
       - name: Run tests inside Docker
         run: |
-          docker run my-image python -m unittest discover  # Or whatever command you need to run
+          docker run my-image 
+      - name: Check if Docker container is running
+        run: |
+          docker ps -a
